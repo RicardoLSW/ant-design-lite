@@ -58,7 +58,9 @@ service.interceptors.request.use(config => {
  * axios 配置全局响应参数
  */
 service.interceptors.response.use(response => {
-  return response.data
+  console.log(response)
+  if (response.config.responseType === 'blob') return response
+  else return response.data
 }, err)
 
 export { service as axios }
