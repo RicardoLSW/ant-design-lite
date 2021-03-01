@@ -1,7 +1,7 @@
 # smec-repair-advice-to-push-ui
 
 ```
-git clone --depth=1 https://github.com/vueComponent/ant-design-vue-pro.git my-project
+git clone --depth=1 https://github.com/RicardoLSW/ant-design-lite.git my-project
 ```
 
 ## Project setup
