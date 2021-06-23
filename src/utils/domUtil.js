@@ -20,4 +20,4 @@ export const setDocumentTitle = function(title) {
   }
 }
 
-export const domTitle = 'ant-design-lite'
+export const domTitle = '鼓式制动器拆解'

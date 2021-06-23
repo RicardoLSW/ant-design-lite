@@ -7,7 +7,7 @@ import bootstrap from './core/bootstrap'
 import './core/lazy_use'
 import '@/global.scss'
 import '@/premission'
-import './mock'
+// import './mock'
 
 Vue.config.productionTip = false
 

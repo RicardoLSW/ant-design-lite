@@ -56,17 +56,16 @@
 </template>
 
 <script>
-import { triggerWindowResizeEvent } from '@/utils/util'
-import { mapActions } from 'vuex'
-import { mixin, mixinDevice } from '@/utils/mixin'
-import config from '@/config/defaultSettings'
+import { triggerWindowResizeEvent } from '../utils/util'
+import { mapActions, mapState } from 'vuex'
+import { mixin, mixinDevice } from '../utils/mixin'
+import config from '../config/defaultSettings'
 
 import RouteView from './RouteView'
-import SideMenu from '@/components/Menu/SideMenu'
-import GlobalHeader from '@/components/GlobalHeader'
-import PageView from '@/layouts/PageView'
-import convertRoutes from '@/utils/routeConvert'
-import { asyncRouterMap } from '@/config/router.config'
+import SideMenu from '../components/Menu/SideMenu'
+import GlobalHeader from '../components/GlobalHeader'
+import PageView from '../layouts/PageView'
+import convertRoutes from '../utils/routeConvert'
 
 export default {
   name: 'BasicLayout',
@@ -85,6 +84,10 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      // 动态主路由
+      mainMenu: state => state.permission.addRouters
+    }),
     contentPaddingLeft() {
       if (!this.fixSidebar || this.isMobile()) {
         return '0'
@@ -101,7 +104,8 @@ export default {
     }
   },
   created() {
-    const routes = convertRoutes(asyncRouterMap.find(item => item.path === '/'))
+    const routes = convertRoutes(this.mainMenu.find(item => item.path === '/'))
+    console.log(routes)
     this.menus = (routes && routes.children) || []
     this.collapsed = !this.sidebarOpened
   },

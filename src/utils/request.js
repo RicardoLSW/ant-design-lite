@@ -1,5 +1,6 @@
 import axios from 'axios'
 import notification from 'ant-design-vue/es/notification'
+import store from '../store'
 
 // 创建 axios 实例
 const service = axios.create({
@@ -33,7 +34,11 @@ const err = error => {
         notification.error({ message: '系统提示', description: '未授权，请重新登录', duration: 4 })
         break
       case 700:
-        notification.error({ message: '系统提示', description: error.response.data.error, duration: 4 })
+        notification.error({
+          message: '系统提示',
+          description: error.response.data.error,
+          duration: 4
+        })
         break
       default:
         notification.error({
@@ -51,6 +56,10 @@ const err = error => {
  * axios 配置全局请求参数
  */
 service.interceptors.request.use(config => {
+  const token = store.getters.token
+  if (token) {
+    config.headers['Authorization'] = token
+  }
   return config
 }, err)
 

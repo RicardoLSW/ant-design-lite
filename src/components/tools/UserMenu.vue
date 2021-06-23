@@ -3,14 +3,14 @@
     <div class="content-box">
       <span class="action ant-dropdown-link user-dropdown-menu">
         <!--        <a-avatar class="avatar" size="small" :src="avatar" />-->
-        <span>Ricardo</span>
+        <span>{{ userInfo().employeeName }}</span>
       </span>
-      <span class="action">
-        <a class="logout_title" href="javascript:;" @click="handleLogout">
-          <a-icon type="logout" />
-          <span>&nbsp;退出登录</span>
-        </a>
-      </span>
+      <!--      <span class="action">-->
+      <!--        <a class="logout_title" href="javascript:;" @click="handleLogout">-->
+      <!--          <a-icon type="logout" />-->
+      <!--          <span>&nbsp;退出登录</span>-->
+      <!--        </a>-->
+      <!--      </span>-->
     </div>
   </div>
 </template>
@@ -18,12 +18,15 @@
 <script>
 // import { mapActions, mapGetters } from 'vuex'
 
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'UserMenu',
   computed: {
     // ...mapGetters(['nickname', 'avatar'])
   },
   methods: {
+    ...mapGetters(['userInfo']),
     handleLogout() {
       this.$confirm({
         title: '提示',

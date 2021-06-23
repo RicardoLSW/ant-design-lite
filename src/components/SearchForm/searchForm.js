@@ -1,5 +1,8 @@
 import Style from './searchForm.module.scss'
 import { Select, Checkbox, Button, Row, Col, Input, Form, DatePicker, Icon } from 'ant-design-vue'
+import { isArray } from 'ant-design-vue/lib/_util/vue-types/utils'
+
+export const [INPUT, SELECT, CHECKBOX, RANGE_PICKER, INPUT_SEARCH] = new Array(6).keys()
 
 export default {
   name: 'SForm',
@@ -70,6 +73,27 @@ export default {
       return 0
     }
   },
+  mounted() {
+    this.config.forEach(item => {
+      if (item.type === SELECT) {
+        const { selectOptions } = item
+        const result = selectOptions()
+        if (
+          (typeof result === 'object' || typeof result === 'function') &&
+          typeof result.then === 'function' &&
+          isArray(item.selectOption) &&
+          item.selectOption.length === 0
+        ) {
+          result.then(r => {
+            item.selectOption = r.data.map((e, i) => ({
+              key: e[r.key],
+              title: e[r.title]
+            }))
+          })
+        }
+      }
+    })
+  },
   methods: {
     reset() {
       this.form.resetFields()
@@ -92,69 +116,84 @@ export default {
     getAllValue() {
       return this.form.getFieldsValue()
     },
-    renderFormItem(item, index) {
-      let tag = null
-      switch (item.type) {
-        case 'input':
-          tag = <Input v-decorator={[item.key]} {...{ props: { placeholder: `请输入${item.value}` } }} />
-          break
-        case 'select':
-          const selectOption = item.selectOptions.map((e, i) => {
-            return (
-              <Select.Option key={i} value={e.key}>
-                {e.value}
-              </Select.Option>
-            )
-          })
-          tag = (
-            <Select v-decorator={[item.key]} {...{ props: { placeholder: `请选择${item.value}` } }}>
-              {selectOption}
-            </Select>
-          )
-          break
-        case 'checkbox':
-          tag = (
-            <Checkbox
-              v-decorator={[
-                item.key,
-                {
-                  valuePropName: 'checked'
-                }
-              ]}
-            />
-          )
-          break
-        case 'range-picker':
-          tag = (
-            <DatePicker.RangePicker
-              v-decorator={[item.key]}
-              style={{ width: '100%' }}
-            ></DatePicker.RangePicker>
-          )
-          break
-        case 'input-search':
-          tag = (
-            <Input.Search
-              v-decorator={[item.key]}
-              {...{
-                props: { placeholder: `请选择${item.value}` },
-                on: { search: () => item.inputSearch(item.key) }
-              }}
-              read-only
-            />
-          )
-          break
-        default:
-          break
-      }
+    renderCol(item, index, node) {
       return (
         <Col
           {...{ props: { md: this.rows, sm: 24 } }}
           v-show={index >= this.rowNumber && this.isUnfold ? this.isShow : 'true'}
         >
-          <Form.Item {...{ props: { label: item.value } }}>{tag}</Form.Item>
+          <Form.Item {...{ props: { label: item.value } }}>{node}</Form.Item>
         </Col>
       )
+    },
+    renderInput(item, index) {
+      return this.renderCol(
+        item,
+        index,
+        <Input v-decorator={[item.key]} {...{ props: { placeholder: `请输入${item.value}` } }} />
+      )
+    },
+    renderSelect(item, index) {
+      return this.renderCol(
+        item,
+        index,
+        <Select
+          v-decorator={[item.key]}
+          options={item.selectOption}
+          {...{ props: { placeholder: `请选择${item.value}` } }}
+        />
+      )
+    },
+    renderCheckbox(item, index) {
+      return this.renderCol(
+        item,
+        index,
+        <Checkbox
+          v-decorator={[
+            item.key,
+            {
+              valuePropName: 'checked'
+            }
+          ]}
+        />
+      )
+    },
+    renderRangePicker(item, index) {
+      return this.renderCol(
+        item,
+        index,
+        <DatePicker.RangePicker v-decorator={[item.key]} style={{ width: '100%' }} />
+      )
+    },
+    renderInputSearch(item, index) {
+      return this.renderCol(
+        item,
+        index,
+        <Input.Search
+          v-decorator={[item.key]}
+          {...{
+            props: { placeholder: `请选择${item.value}` },
+            on: { search: () => item.inputSearch(item.key) }
+          }}
+          read-only
+        />
+      )
+    },
+    renderFormItem(item, index) {
+      switch (item.type) {
+        case INPUT:
+          return this.renderInput(item, index)
+        case SELECT:
+          return this.renderSelect(item, index)
+        case CHECKBOX:
+          return this.renderCheckbox(item, index)
+        case RANGE_PICKER:
+          return this.renderRangePicker(item, index)
+        case INPUT_SEARCH:
+          return this.renderInputSearch(item, index)
+        default:
+          break
+      }
     },
     renderActionButton() {
       let btnGroup = null
@@ -173,17 +212,25 @@ export default {
       let unfold = null
       if (this.config.length > this.rowNumber && this.isUnfold)
         unfold = (
-          <a style={{ marginLeft: '8px' }} {...{ on: { click: () => (this.isShow = !this.isShow) } }}>
+          <a
+            style={{ marginLeft: '8px' }}
+            {...{ on: { click: () => (this.isShow = !this.isShow) } }}
+          >
             {this.isShow ? '收起' : '展开'}
             <Icon type={this.isShow ? 'up' : 'down'} />
           </a>
         )
       const buttonGroup = [
-        <Col {...{ props: { md: this.buttonMD, sm: 24 } }} style={{ float: 'right', overflow: 'hidden' }}>
+        <Col
+          {...{ props: { md: this.buttonMD, sm: 24 } }}
+          style={{ float: 'right', overflow: 'hidden' }}
+        >
           <span
             class={Style['table-page-search-submitButtons']}
             style={{ float: 'right', overflow: 'hidden' }}
           >
+            {/* 在查询、重置左边添加自定义按钮 */}
+            {this.$slots.defaultButtonGroup}
             {btnGroup}
             <Button
               {...{
@@ -197,8 +244,6 @@ export default {
             <Button {...{ on: { click: this.reset } }} style={{ marginLeft: '8px' }}>
               重置
             </Button>
-            {/* 在查询、重置右边添加自定义按钮 */}
-            {this.$slots.defaultButtonGroup}
             {unfold}
           </span>
         </Col>
@@ -207,7 +252,9 @@ export default {
       if (this.$slots.leftButtonGroup) {
         buttonGroup.unshift(
           <Col {...{ props: { md: 16, sm: 24 } }}>
-            <span class={Style['table-page-search-submitButtons']}>{this.$slots.leftButtonGroup}</span>
+            <span class={Style['table-page-search-submitButtons']}>
+              {this.$slots.leftButtonGroup}
+            </span>
           </Col>
         )
       }
@@ -215,7 +262,6 @@ export default {
     }
   },
   render(createElement, context) {
-    console.log(this.$slots)
     const props = {
       props: {
         labelCol: this.labelCol,
@@ -238,7 +284,9 @@ export default {
       ]
     else
       queryForm = (
-        <Row {...{ props: { gutter: this.gutter } }}>{formItem.concat(this.renderActionButton())}</Row>
+        <Row {...{ props: { gutter: this.gutter } }}>
+          {formItem.concat(this.renderActionButton())}
+        </Row>
       )
     return (
       <div class={Style['table-page-search-wrapper']}>

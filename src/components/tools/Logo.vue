@@ -8,12 +8,14 @@
 </template>
 
 <script>
+import { domTitle } from '../../utils/domUtil'
+
 export default {
   name: 'Logo',
   props: {
     title: {
       type: String,
-      default: '项目标题',
+      default: domTitle,
       required: false
     },
     showTitle: {

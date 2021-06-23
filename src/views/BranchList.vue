@@ -9,7 +9,7 @@
         @search="$refs.table.refresh()"
       >
         <template slot="defaultButtonGroup">
-          <a-button type="primary" @click="exportExcel">导出</a-button>
+          <a-button type="primary">导出</a-button>
         </template>
       </s-form>
     </a-card>
@@ -34,11 +34,11 @@
 <script>
 import { SForm, STable, Ellipsis } from '../components'
 import { INPUT, RANGE_PICKER, SELECT } from '../components/SearchForm/searchForm'
-import { elevators, excel, removeTag } from '../api/api'
+import { elevators, removeTag } from '../api/api'
 import * as _ from 'lodash'
 import moment from 'moment'
 export default {
-  name: 'HelloWorld',
+  name: 'BranchList',
   components: { SForm, STable, Ellipsis },
   data() {
     return {
@@ -56,7 +56,6 @@ export default {
           selectOptions: () => {}
         },
         { key: 'orgName', value: '维保单位名称', type: INPUT },
-        { key: 'branchOrgName', value: '所属分公司', type: INPUT },
         {
           key: 'activeStatusCode',
           value: '有效性',
@@ -157,7 +156,9 @@ export default {
       ],
       loadData: parameter => {
         console.log(parameter)
-        const params = {}
+        const params = {
+          branchOrgName: ''
+        }
         if (
           Array.isArray(this.$refs.searchForm.getAllValue().startEndDate) &&
           this.$refs.searchForm.getAllValue().startEndDate.length
@@ -177,53 +178,22 @@ export default {
               'eleContractNo',
               'type',
               'orgName',
-              'branchOrgName',
               'brakesType',
               'brakesType'
             ])
           )
-        ).then(res => {
-          console.log(res)
-          return {
-            data: res.result.content,
-            page: parameter.page,
-            size: parameter.size,
-            totalCount: res.result.totalElements
-          }
-        })
+        ).then(res => ({
+          data: res.result.content,
+          page: parameter.page,
+          size: parameter.size,
+          totalCount: res.result.totalElements
+        }))
       }
     }
   },
   methods: {
     toRecord(data) {
       this.$router.push({ name: 'Record', query: { ...data } })
-    },
-    exportExcel() {
-      const params = {}
-      if (
-        Array.isArray(this.$refs.searchForm.getAllValue().startEndDate) &&
-        this.$refs.searchForm.getAllValue().startEndDate.length
-      ) {
-        params.startDate = moment(this.$refs.searchForm.getAllValue().startEndDate[0]).format(
-          'YYYY-MM-DD'
-        )
-        params.endDate = moment(this.$refs.searchForm.getAllValue().startEndDate[1]).format(
-          'YYYY-MM-DD'
-        )
-      }
-      excel(
-        Object.assign(
-          params,
-          _.pick(this.$refs.searchForm.getAllValue(), [
-            'eleContractNo',
-            'type',
-            'orgName',
-            'branchOrgName',
-            'brakesType',
-            'brakesType'
-          ])
-        )
-      ).then()
     },
     removeType(eleContractNo) {
       removeTag({ eleContractNo }).then(() => {

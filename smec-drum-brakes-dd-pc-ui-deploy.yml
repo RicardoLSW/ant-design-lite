@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: { { instance_name } }
+  labels:
+    app: { { instance_name } }
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: { { instance_name } }
+  template:
+    metadata:
+      name: { { instance_name } }
+      labels:
+        app: { { instance_name } }
+    spec:
+      containers:
+        - name: { { instance_name } }
+          image: { { smec-drum-brakes-dd-pc-ui.image } }
+          ports:
+            - containerPort: 80 # 容器端口
+          env:
+            - name: SW_AGENT_NAMESPACE
+              value: { { SW_AGENT_NAMESPACE } }
+            - name: SW_AGENT_NAME
+              value: { { SW_AGENT_NAME } }
+            - name: SW_AGENT_COLLECTOR_BACKEND_SERVICES
+              value: { { SW_AGENT_COLLECTOR_BACKEND_SERVICES } }
+          resources:
+            limits:
+              cpu: '{{ CPU_NUM }}' # cpu 限制
+              memory: '{{ MEMORY_NUM }}' # 内存限制
+            requests:
+              cpu: '0.001'
+              memory: '0.001Mi'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: { { instance_name } }
+spec:
+  type: NodePort
+  ports:
+    - port: 80 # 服务端口
+  selector:
+    app: { { instance_name } }

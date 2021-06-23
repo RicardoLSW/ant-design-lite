@@ -1,6 +1,6 @@
 {
-  "name": "ant-design-lite",
-  "version": "1.0.0",
+  "name": "smec-drum-brakes-dd-pc-ui",
+  "version": "v1.0.0-alpha.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -13,9 +13,11 @@
     "ant-design-vue": "^1.6.5",
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
+    "dingtalk-jsapi": "^2.13.42",
     "enquire.js": "^2.1.6",
     "lodash": "^4.17.20",
     "mockjs": "^1.1.0",
+    "moment": "^2.29.1",
     "vue": "^2.6.11",
     "vue-ls": "^3.2.1",
     "vue-router": "^3.2.0",
@@ -56,7 +58,6 @@
   },
   "lint-staged": {
     "*.{js,jsx,vue}": [
-      "vue-cli-service lint",
       "prettier --write",
       "git add"
     ]

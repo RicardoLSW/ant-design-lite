@@ -15,9 +15,18 @@ import {
   exportAction,
   // eslint-disable-next-line
   http2Action
-} from '@/api/manage'
+} from './manage'
 
-const toBeProcessList = params => getAction('/to-be-process-list', params)
-const userList = params => getAction('/user-list', params)
+const auth = params => getAction(`/auth/login/${params}`, {}) // 获取用户信息
 
-export { toBeProcessList, userList }
+const elevators = params => getAction('/brakes/elevator', params)
+
+const getRecord = params => getAction('/brakes/record', params)
+
+const brakesInvalid = params => putAction('/brakes/invalid', params)
+
+const excel = params => exportAction('/brakes/elevator/export', params)
+
+const removeTag = params => deleteAction('/elevator/tag', params)
+
+export { auth, elevators, getRecord, brakesInvalid, excel, removeTag }

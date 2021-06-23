@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import config from '@/config/defaultSettings'
+import config from '../config/defaultSettings'
 
 import VueStorage from 'vue-ls'
 
@@ -22,7 +22,11 @@ import {
   ConfigProvider,
   notification,
   Select,
-  Dropdown
+  Dropdown,
+  Timeline,
+  Upload,
+  Empty,
+  message
 } from 'ant-design-vue'
 
 Vue.use(Button)
@@ -43,8 +47,12 @@ Vue.use(Button)
   .use(ConfigProvider)
   .use(Select)
   .use(Dropdown)
+  .use(Timeline)
+  .use(Upload)
+  .use(Empty)
 
 Vue.prototype.$notification = notification
 Vue.prototype.$confirm = Modal.confirm
+Vue.prototype.$message = message
 
 Vue.use(VueStorage, config.storageOptions)
